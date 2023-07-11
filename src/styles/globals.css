@@ -5,3 +5,19 @@
 body {
   @apply bg-gray-900;
 }
+
+.scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #4f40ae;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #352c70;
+}
