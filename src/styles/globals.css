@@ -21,3 +21,8 @@ body {
 .scrollbar::-webkit-scrollbar-thumb:hover {
   background: #352c70;
 }
+
+.page-container {
+  height: 900px;
+  overflow-y: auto;
+}

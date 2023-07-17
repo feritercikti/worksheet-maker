@@ -1,12 +1,12 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import 'react-quill/dist/quill.snow.css';
-import { ColorProvider } from './context/ColorContext';
+import { WorkSheetProvider } from './context/WorkSheetContext';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ColorProvider>
-      <Component {...pageProps} />{' '}
-    </ColorProvider>
+    <WorkSheetProvider>
+      <Component {...pageProps} />
+    </WorkSheetProvider>
   );
 }

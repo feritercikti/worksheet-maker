@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 
 interface FontSizeChangerProps {
   onChange: (fontSize: number, type: string) => void;
-  initialValue?: number;
+  initialValue: number;
   type: string;
 }
 
 const FontSizeChanger: React.FC<FontSizeChangerProps> = ({
   onChange,
-  initialValue = 16,
+  initialValue,
   type,
 }) => {
   const [fontSize, setFontSize] = useState<number>(initialValue);
@@ -20,14 +20,14 @@ const FontSizeChanger: React.FC<FontSizeChangerProps> = ({
   };
 
   return (
-    <div>
+    <div className='text-[14px]'>
       <input
         type='range'
         min='10'
         max='52'
         value={fontSize}
         onChange={handleFontSizeChange}
-        className='py-2'
+        className=''
       />
       <p>{fontSize}px</p>
     </div>

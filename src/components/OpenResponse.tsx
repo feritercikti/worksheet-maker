@@ -11,7 +11,7 @@ const OpenResponse = () => {
         >
           <h2 className='text-indigo-700 font-bold'>Open Response</h2>
         </div>
-        <TextEditor />
+        {/* <TextEditor /> */}
       </div>
     </div>
   );
