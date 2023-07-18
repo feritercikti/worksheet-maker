@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
-import React, { useMemo, useState, useRef, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MdDelete } from 'react-icons/md';
+import { AiOutlinePlusCircle, AiOutlineCloseCircle } from 'react-icons/ai';
 import { HexColorPicker } from 'react-colorful';
 import FontSizeChanger from '@/components/FontSizeChanger';
 import MultipleChoice from '@/components/MultipleChoice';
@@ -17,6 +18,7 @@ import PageInstructions from '@/components/PageComponents/PageInstructions';
 import PageSectionHeader from '@/components/PageComponents/PageSectionHeader';
 import PageContainer from '@/components/PageComponents/PageContainer';
 import { v4 as uuidv4 } from 'uuid';
+import AddOption from '@/components/AddOption';
 
 interface StudentInfo {
   name?: string;
@@ -34,6 +36,7 @@ const Worksheet = () => {
   const [fontSize, setFontSize] = useState<number>(26);
   const [color, setColor] = useState('#000000');
   const [showPalette, setShowPalette] = useState(false);
+  const [showAddOption, setShowAddOption] = useState(false);
   const [showStudentPalette, setShowStudentPalette] = useState(false);
   const [studentInfo, setStudentInfo] = useState<StudentInfo[]>([
     { name: 'Name', fontSize: 16 },
@@ -45,6 +48,7 @@ const Worksheet = () => {
   );
   const [instructions, setInstructions] = useState<string[]>([]);
   const [questions, setQuestions] = useState<string[]>([]);
+  const [directions, setDirections] = useState<string[]>([]);
 
   const modules = {
     toolbar: [['bold', 'italic', 'underline']],
@@ -105,7 +109,18 @@ const Worksheet = () => {
       id: uuidv4(),
       optionType: selectedOption,
     };
-    setOptions((prevOptions) => [...prevOptions, newOption]);
+    if (options.length > 0 && showAddOption) {
+      const currentIndex = options.findIndex(
+        (option, index) => index !== options.length - 1
+      );
+      const updatedOptions = [...options];
+      updatedOptions.splice(currentIndex, 0, newOption);
+      setOptions(updatedOptions);
+    } else {
+      setOptions((prevOptions) => [...prevOptions, newOption]);
+    }
+
+    setShowAddOption(false);
   };
 
   const handleInstructionChange = (id: string, newInstruction: string) => {
@@ -127,6 +142,17 @@ const Worksheet = () => {
         updatedQuestions[index] = newQuestion;
       }
       return updatedQuestions;
+    });
+  };
+
+  const handleDirectionChange = (id: string, newQuestion: string) => {
+    setDirections((prevDirections) => {
+      const updatedDirections: string[] = [...prevDirections];
+      const index = options.findIndex((option) => option.id === id);
+      if (index !== -1) {
+        updatedDirections[index] = newQuestion;
+      }
+      return updatedDirections;
     });
   };
 
@@ -245,7 +271,28 @@ const Worksheet = () => {
           </div>
         </div>
         {options.map((option, index) => (
-          <div key={option.id} className='flex'>
+          <div key={option.id} className='flex flex-col'>
+            {options.length > 0 && (
+              <div key={option.id}>
+                {showAddOption ? (
+                  <AddOption
+                    selectedOption={selectedOption}
+                    handleOptionChange={handleOptionChange}
+                    handleAddClick={handleAddClick}
+                    setShowAddOption={setShowAddOption}
+                  />
+                ) : (
+                  <div className='w-full h-[1px] flex justify-center items-center bg-white mb-5 '>
+                    <button onClick={() => setShowAddOption(true)}>
+                      <AiOutlinePlusCircle
+                        className='text-white bg-gray-800 rounded-[50%] cursor-pointer'
+                        size={20}
+                      />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
             <div className='w-full mb-5 bg-white'>
               {option.optionType === 'multiple-choice' && (
                 <MultipleChoice
@@ -255,7 +302,9 @@ const Worksheet = () => {
               )}
               {option.optionType === 'open-response' && <OpenResponse />}
               {option.optionType === 'fill-in-the-blank' && <FillBlank />}
-              {option.optionType === 'checklist' && <Checklist />}
+              {option.optionType === 'checklist' && (
+                <Checklist onUpdate={handleDirectionChange} id={option.id} />
+              )}
               {option.optionType === 'instruction-box' && (
                 <InstructionBox
                   id={option.id}
@@ -280,9 +329,10 @@ const Worksheet = () => {
             </div>
           </div>
         ))}
-        <div className='w-full items-center justify-center flex gap-2 '>
+
+        <div className='w-full items-center justify-center flex '>
           <select
-            className='select-dropdown bg-white border border-gray-300 py-2 px-4  shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+            className='select-dropdown w-full bg-white border border-gray-300 py-2 px-4  shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
             value={selectedOption}
             onChange={handleOptionChange}
           >
@@ -301,6 +351,7 @@ const Worksheet = () => {
           </button>
         </div>
       </div>
+
       <div className='flex-[3_3_0%] flex '>
         <div className='flex flex-col h-[900px] mb-20 gap-2 ml-12 bg-white w-[800px] p-10 '>
           <div className='flex justify-between w-full flex-end'>
@@ -337,6 +388,10 @@ const Worksheet = () => {
                 (opt, idx) =>
                   idx < index && opt.optionType === 'multiple-choice'
               ).length + 1;
+            const checkListIndex =
+              options.filter(
+                (opt, idx) => idx < index && opt.optionType === 'checklist'
+              ).length + 1;
             return (
               <div key={option.id} className='break-words mt-4'>
                 {option.optionType === 'multiple-choice' && (
@@ -348,7 +403,13 @@ const Worksheet = () => {
                 )}
                 {option.optionType === 'open-response' && <PageOpenResponse />}
                 {option.optionType === 'fill-in-the-blank' && <PageFillBlank />}
-                {option.optionType === 'checklist' && <PageCheckList />}
+                {option.optionType === 'checklist' && (
+                  <PageCheckList
+                    direction={directions[index]}
+                    id={option.id}
+                    index={checkListIndex}
+                  />
+                )}
                 {option.optionType === 'instruction-box' && (
                   <PageInstructions
                     instruction={instructions[index]}

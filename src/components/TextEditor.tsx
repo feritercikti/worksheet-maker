@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 
 interface TextEditorProps {
   val?: string;
-  onChange: (newInstruction: string) => void;
+  onChange: (newSentence: string) => void;
 }
 const TextEditor = ({ val, onChange }: TextEditorProps) => {
   const ReactQuill = useMemo(
