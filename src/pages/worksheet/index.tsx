@@ -1,7 +1,6 @@
 import dynamic from 'next/dynamic';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useContext } from 'react';
 import { MdDelete } from 'react-icons/md';
-import { AiOutlinePlusCircle, AiOutlineCloseCircle } from 'react-icons/ai';
 import { HexColorPicker } from 'react-colorful';
 import FontSizeChanger from '@/components/FontSizeChanger';
 import MultipleChoice from '@/components/MultipleChoice';
@@ -17,13 +16,19 @@ import PageMultipleChoice from '@/components/PageComponents/PageMultipleChoice';
 import PageInstructions from '@/components/PageComponents/PageInstructions';
 import PageSectionHeader from '@/components/PageComponents/PageSectionHeader';
 import PageContainer from '@/components/PageComponents/PageContainer';
-import { v4 as uuidv4 } from 'uuid';
+import { WorkSheetContext } from '../context/WorkSheetContext';
 import AddOption from '@/components/AddOption';
+import { AiOutlinePlusCircle } from 'react-icons/ai';
+import { v4 as uuidv4 } from 'uuid';
 
 interface StudentInfo {
   name?: string;
   placeholder?: string;
   fontSize?: number;
+}
+
+interface ShowAddOptionState {
+  [optionId: string]: boolean;
 }
 
 const Worksheet = () => {
@@ -32,29 +37,44 @@ const Worksheet = () => {
     []
   );
 
+  const {
+    handleOptionChange,
+    handleInstructionChange,
+    handleQuestionChange,
+    handleDirectionChange,
+    handleHeaderChange,
+    selectedOption,
+    options,
+    setOptions,
+    instructions,
+    headers,
+    questions,
+    directions,
+  } = useContext(WorkSheetContext);
+
   const [value, setValue] = useState<string>('My Worksheet Title');
   const [fontSize, setFontSize] = useState<number>(26);
   const [color, setColor] = useState('#000000');
   const [showPalette, setShowPalette] = useState(false);
-  const [showAddOption, setShowAddOption] = useState(false);
   const [showStudentPalette, setShowStudentPalette] = useState(false);
   const [studentInfo, setStudentInfo] = useState<StudentInfo[]>([
     { name: 'Name', fontSize: 16 },
   ]);
   const [studentInfoColor, setStudentInfoColor] = useState('#000000');
-  const [selectedOption, setSelectedOption] = useState('open-response');
-  const [options, setOptions] = useState<{ id: string; optionType: string }[]>(
-    []
-  );
-  const [instructions, setInstructions] = useState<string[]>([]);
-  const [questions, setQuestions] = useState<string[]>([]);
-  const [directions, setDirections] = useState<string[]>([]);
+  const [showAddOption, setShowAddOption] = useState<ShowAddOptionState>({});
 
   const modules = {
     toolbar: [['bold', 'italic', 'underline']],
   };
 
   const formats = ['bold', 'italic', 'underline'];
+
+  const toggleShowAddOption = (optionId: string) => {
+    setShowAddOption((prevState) => ({
+      ...prevState,
+      [optionId]: !prevState[optionId],
+    }));
+  };
 
   const handleFontSizeChange = (fontSize: number, type: string) => {
     if (type === 'title') {
@@ -100,81 +120,14 @@ const Worksheet = () => {
     });
   };
 
-  const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(event.target.value);
-  };
-
-  const handleAddClick = () => {
+  const handleAddNewOption = () => {
     const newOption = {
       id: uuidv4(),
       optionType: selectedOption,
     };
-    if (options.length > 0 && showAddOption) {
-      const currentIndex = options.findIndex(
-        (option, index) => index !== options.length - 1
-      );
-      const updatedOptions = [...options];
-      updatedOptions.splice(currentIndex, 0, newOption);
-      setOptions(updatedOptions);
-    } else {
-      setOptions((prevOptions) => [...prevOptions, newOption]);
-    }
 
-    setShowAddOption(false);
+    setOptions((prevOptions) => [...prevOptions, newOption]);
   };
-
-  const handleInstructionChange = (id: string, newInstruction: string) => {
-    setInstructions((prevInstructions) => {
-      const updatedInstructions: string[] = [...prevInstructions];
-      const index = options.findIndex((option) => option.id === id);
-      if (index !== -1) {
-        updatedInstructions[index] = newInstruction;
-      }
-      return updatedInstructions;
-    });
-  };
-
-  const handleQuestionChange = (id: string, newQuestion: string) => {
-    setQuestions((prevQuestions) => {
-      const updatedQuestions: string[] = [...prevQuestions];
-      const index = options.findIndex((option) => option.id === id);
-      if (index !== -1) {
-        updatedQuestions[index] = newQuestion;
-      }
-      return updatedQuestions;
-    });
-  };
-
-  const handleDirectionChange = (id: string, newQuestion: string) => {
-    setDirections((prevDirections) => {
-      const updatedDirections: string[] = [...prevDirections];
-      const index = options.findIndex((option) => option.id === id);
-      if (index !== -1) {
-        updatedDirections[index] = newQuestion;
-      }
-      return updatedDirections;
-    });
-  };
-
-  const handleDeleteOption = (id: string, index?: number) => {
-    setOptions((prevOptions) => {
-      const updatedOptions = prevOptions.filter((option) => option.id !== id);
-      return updatedOptions;
-    });
-
-    setInstructions((prevInstructions) => {
-      const updatedInstructions = prevInstructions.filter(
-        (_, i) => i !== index
-      );
-      return updatedInstructions;
-    });
-    setQuestions((prevQuestions) => {
-      const updatedQuestions = prevQuestions.filter((_, i) => i !== index);
-      return updatedQuestions;
-    });
-  };
-
-  console.log(options);
 
   return (
     <div className='flex  mt-20 mx-10 justif-center gap-10'>
@@ -208,7 +161,7 @@ const Worksheet = () => {
                   <HexColorPicker color={color} onChange={setColor} />
                 )}
               </div>
-              <div className='flex flex-col mr-2'>
+              <div className='flex flex-col mr-2 gap-2'>
                 <h2 className='font-bold text-[14px]'>Font Size</h2>
                 <FontSizeChanger
                   onChange={handleFontSizeChange}
@@ -274,16 +227,14 @@ const Worksheet = () => {
           <div key={option.id} className='flex flex-col'>
             {options.length > 0 && (
               <div key={option.id}>
-                {showAddOption ? (
+                {showAddOption[option.id] ? (
                   <AddOption
-                    selectedOption={selectedOption}
-                    handleOptionChange={handleOptionChange}
-                    handleAddClick={handleAddClick}
-                    setShowAddOption={setShowAddOption}
+                    id={option.id}
+                    toggleShowAddOption={toggleShowAddOption}
                   />
                 ) : (
                   <div className='w-full h-[1px] flex justify-center items-center bg-white mb-5 '>
-                    <button onClick={() => setShowAddOption(true)}>
+                    <button onClick={() => toggleShowAddOption(option.id)}>
                       <AiOutlinePlusCircle
                         className='text-white bg-gray-800 rounded-[50%] cursor-pointer'
                         size={20}
@@ -293,38 +244,40 @@ const Worksheet = () => {
                 )}
               </div>
             )}
-            <div className='w-full mb-5 bg-white'>
+            <div className='w-full mb-5 '>
               {option.optionType === 'multiple-choice' && (
                 <MultipleChoice
                   id={option.id}
                   onUpdate={handleQuestionChange}
+                  index={index}
                 />
               )}
-              {option.optionType === 'open-response' && <OpenResponse />}
-              {option.optionType === 'fill-in-the-blank' && <FillBlank />}
+              {option.optionType === 'open-response' && (
+                <OpenResponse id={option.id} index={index} />
+              )}
+              {option.optionType === 'fill-in-the-blank' && (
+                <FillBlank id={option.id} index={index} />
+              )}
               {option.optionType === 'checklist' && (
-                <Checklist onUpdate={handleDirectionChange} id={option.id} />
+                <Checklist
+                  onUpdate={handleDirectionChange}
+                  id={option.id}
+                  index={index}
+                />
               )}
               {option.optionType === 'instruction-box' && (
                 <InstructionBox
                   id={option.id}
                   onUpdate={handleInstructionChange}
+                  index={index}
                 />
               )}
               {option.optionType === 'section-header' && (
-                <SectionHeader key={option.id} />
-              )}
-              {options.length > 0 && (
-                <div className='w-full flex flex-col '>
-                  <span className='w-full bg-gray-300 h-[1px]'></span>
-                  <div className='w-full flex justify-end'>
-                    <MdDelete
-                      size={25}
-                      className=' text-red-500  m-2 cursor-pointer hover:text-red-800 '
-                      onClick={() => handleDeleteOption(option.id, index)}
-                    />
-                  </div>
-                </div>
+                <SectionHeader
+                  id={option.id}
+                  index={index}
+                  onUpdate={handleHeaderChange}
+                />
               )}
             </div>
           </div>
@@ -345,7 +298,7 @@ const Worksheet = () => {
           </select>
           <button
             className='add-button bg-blue-500 text-white py-2 px-4  shadow hover:bg-blue-600'
-            onClick={handleAddClick}
+            onClick={handleAddNewOption}
           >
             Add
           </button>
@@ -417,7 +370,7 @@ const Worksheet = () => {
                   />
                 )}
                 {option.optionType === 'section-header' && (
-                  <PageSectionHeader key={option.id} />
+                  <PageSectionHeader id={option.id} header={headers[index]} />
                 )}
               </div>
             );

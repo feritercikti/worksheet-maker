@@ -1,6 +1,11 @@
 import React from 'react';
 
-const FillBlank = () => {
+interface FillBlankProps {
+  id: string;
+  index: number;
+}
+
+const FillBlank = ({ id, index }: FillBlankProps) => {
   return (
     <div className='w-full mb-5 bg-white'>
       <div className='py-2 bg-indigo-200 text-center cursor-pointer'>

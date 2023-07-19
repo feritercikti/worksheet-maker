@@ -1,7 +1,12 @@
 import React from 'react';
 import TextEditor from './TextEditor';
 
-const OpenResponse = () => {
+interface OpenResponseProps {
+  id: string;
+  index: number;
+}
+
+const OpenResponse = ({ id, index }: OpenResponseProps) => {
   return (
     <div className='w-full mb-5 bg-white'>
       <div className=' bg-indigo-200 cursor-pointer'>

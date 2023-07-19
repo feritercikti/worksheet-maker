@@ -1,19 +1,15 @@
-import React from 'react';
+import { WorkSheetContext } from '@/pages/context/WorkSheetContext';
+import React, { useContext } from 'react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 
 interface AddOptionProps {
-  selectedOption: string;
-  handleOptionChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  handleAddClick: () => void;
-  setShowAddOption: (show: boolean) => void;
+  id: string;
+  toggleShowAddOption: (id: string) => void;
 }
 
-const AddOption = ({
-  selectedOption,
-  handleOptionChange,
-  handleAddClick,
-  setShowAddOption,
-}: AddOptionProps) => {
+const AddOption = ({ id, toggleShowAddOption }: AddOptionProps) => {
+  const { handleOptionChange, handleAddClick, selectedOption } =
+    useContext(WorkSheetContext);
   return (
     <div className='w-full bg-white items-center justify-center flex  relative mb-5'>
       <select
@@ -30,11 +26,11 @@ const AddOption = ({
       </select>
       <button
         className='add-button bg-blue-500 text-white py-2 px-4  shadow hover:bg-blue-600'
-        onClick={handleAddClick}
+        onClick={() => handleAddClick(id)}
       >
         Add
       </button>
-      <button onClick={() => setShowAddOption(false)}>
+      <button onClick={() => toggleShowAddOption(id)}>
         <AiOutlineCloseCircle
           className='text-white bg-gray-800 hover:bg-gray-500 rounded-[50%] cursor-pointer absolute -right-2 -top-2'
           size={20}
