@@ -1,17 +1,14 @@
 import React, { useState, useContext } from 'react';
 import TextEditor from './TextEditor';
-import { WorkSheetContext } from '@/pages/context/WorkSheetContext';
+import { WorkSheetContext } from '@/context/WorkSheetContext';
 import { MdDelete } from 'react-icons/md';
-import AddOption from './AddOption';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 interface ChecklistProps {
   id: string;
   index: number;
-  onUpdate: (id: string, newQuestion: string) => void;
 }
 
-const Checklist = ({ id, onUpdate, index }: ChecklistProps) => {
+const Checklist = ({ id, index }: ChecklistProps) => {
   const [showPanel, setShowPanel] = useState(true);
   const [direction, setDirection] = useState<string>(
     'Write your direction here'
@@ -22,6 +19,7 @@ const Checklist = ({ id, onUpdate, index }: ChecklistProps) => {
     updateCheckList,
     showDirections,
     setShowDirections,
+    handleDirectionChange,
     handleDeleteOption,
   } = useContext(WorkSheetContext);
 
@@ -31,9 +29,9 @@ const Checklist = ({ id, onUpdate, index }: ChecklistProps) => {
     setShowDirections(id, event.target.checked);
   };
 
-  const handleDirectionChange = (newDirection: string) => {
+  const handleDirectionChanged = (newDirection: string) => {
     setDirection(newDirection);
-    onUpdate(id, newDirection);
+    handleDirectionChange(id, newDirection);
   };
 
   const handleOptionChange = (index: number, value: string) => {
@@ -75,7 +73,7 @@ const Checklist = ({ id, onUpdate, index }: ChecklistProps) => {
               <h2 className='font-bold '>Directions</h2>
             </div>
             {showDirections[id] && (
-              <TextEditor val={direction} onChange={handleDirectionChange} />
+              <TextEditor val={direction} onChange={handleDirectionChanged} />
             )}
             <h1 className='text-[14px] font-bold mx-6 mt-2'>
               Checklist Options

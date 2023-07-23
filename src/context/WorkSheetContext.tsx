@@ -20,6 +20,9 @@ interface WorkSheetContextProps {
   fontSizes: Record<string, number>;
   borderColors: Record<string, string>;
   borderStyles: Record<string, string>;
+  lineThicknesses: Record<string, number>;
+  topPaddings: Record<string, number>;
+  bottomPaddings: Record<string, number>;
   fontColors: Record<string, string>;
   answers: Record<string, string[]>;
   checklistOptions: Record<string, string[]>;
@@ -29,6 +32,9 @@ interface WorkSheetContextProps {
   setTextAlignment: (id: string, alignment: TextAlign | undefined) => void;
   setShowDirections: (id: string, show: boolean) => void;
   setBorderSize: (id: string, size: number) => void;
+  setLineThickness: (id: string, size: number) => void;
+  setTopPadding: (id: string, size: number) => void;
+  setBottomPadding: (id: string, size: number) => void;
   setFontSize: (id: string, size: number) => void;
   setBorderColor: (id: string, color: string) => void;
   setFontColor: (id: string, color: string) => void;
@@ -39,6 +45,7 @@ interface WorkSheetContextProps {
   handleOptionChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   handleAddClick: (id: string) => void;
   handleInstructionChange: (id: string, newInstruction: string) => void;
+  handleTextChange: (id: string, newInstruction: string) => void;
   handleQuestionChange: (id: string, newQuestion: string) => void;
   handleDirectionChange: (id: string, newDirection: string) => void;
   handleHeaderChange: (id: string, newHeader: string) => void;
@@ -49,6 +56,7 @@ interface WorkSheetContextProps {
   instructions: string[];
   questions: string[];
   directions: string[];
+  texts: string[];
   headers: string[];
 }
 
@@ -59,12 +67,18 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   borderStyles: {},
   textAlignments: {},
   fontColors: {},
+  lineThicknesses: {},
+  topPaddings: {},
+  bottomPaddings: {},
   answers: {},
   checklistOptions: {},
   columnNumbers: {},
   showDirections: {},
   setShowDirections: () => {},
   setBorderSize: () => {},
+  setLineThickness: () => {},
+  setTopPadding: () => {},
+  setBottomPadding: () => {},
   setFontSize: () => {},
   setBorderColor: () => {},
   setFontColor: () => {},
@@ -76,6 +90,7 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   handleOptionChange: () => {},
   handleAddClick: () => {},
   handleInstructionChange: () => {},
+  handleTextChange: () => {},
   handleQuestionChange: () => {},
   handleDirectionChange: () => {},
   handleHeaderChange: () => {},
@@ -86,6 +101,7 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   instructions: [],
   questions: [],
   directions: [],
+  texts: [],
   headers: [],
 });
 
@@ -100,7 +116,13 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   >({});
 
   const [fontColors, setFontColors] = useState<Record<string, string>>({});
-
+  const [lineThicknesses, setLineThicknesses] = useState<
+    Record<string, number>
+  >({});
+  const [topPaddings, setTopPaddings] = useState<Record<string, number>>({});
+  const [bottomPaddings, setBottomPaddings] = useState<Record<string, number>>(
+    {}
+  );
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [checklistOptions, setChecklistOptions] = useState<
     Record<string, string[]>
@@ -119,6 +141,8 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   const [instructions, setInstructions] = useState<string[]>([]);
   const [questions, setQuestions] = useState<string[]>([]);
   const [directions, setDirections] = useState<string[]>([]);
+  const [texts, setTexts] = useState<string[]>([]);
+
   const [headers, setHeaders] = useState<string[]>([]);
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -131,21 +155,84 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
       optionType: selectedOption,
     };
 
-    if (options.length > 0) {
-      const currentIndex = options.findIndex(
-        (option) => option.id === currentOptionId
-      );
+    const currentIndex = options.findIndex(
+      (option) => option.id === currentOptionId
+    );
+    setOptions((prevOptions) => {
+      if (currentIndex !== -1) {
+        return [
+          ...prevOptions.slice(0, currentIndex),
+          newOption,
+          ...prevOptions.slice(currentIndex),
+        ];
+      } else {
+        return [...prevOptions, newOption];
+      }
+    });
 
-      const updatedOptions = [
-        ...options.slice(0, currentIndex),
-        newOption,
-        ...options.slice(currentIndex),
-      ];
+    setTexts((prevTexts) => {
+      const updatedTexts = [...prevTexts];
+      if (currentIndex !== -1) {
+        updatedTexts.splice(currentIndex, 0, 'Write your text here');
+      } else {
+        updatedTexts.push('Write your text here');
+      }
+      return updatedTexts;
+    });
 
-      setOptions(updatedOptions);
-    } else {
-      setOptions((prevOptions) => [...prevOptions, newOption]);
-    }
+    setHeaders((prevHeaders) => {
+      const updatedHeaders = [...prevHeaders];
+      if (currentIndex !== -1) {
+        updatedHeaders.splice(currentIndex, 0, 'Write your header here');
+      } else {
+        updatedHeaders.push('Write your header here');
+      }
+      return updatedHeaders;
+    });
+
+    setInstructions((prevInstructions) => {
+      const updatedInstructions = [...prevInstructions];
+      if (currentIndex !== -1) {
+        updatedInstructions.splice(
+          currentIndex,
+          0,
+          'Write your instruction here'
+        );
+      } else {
+        updatedInstructions.push('Write your instruction here');
+      }
+      return updatedInstructions;
+    });
+
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      if (currentIndex !== -1) {
+        updatedQuestions.splice(currentIndex, 0, 'Write your question here');
+      } else {
+        updatedQuestions.push('Write your question here');
+      }
+      return updatedQuestions;
+    });
+
+    setDirections((prevDirections) => {
+      const updatedDirections = [...prevDirections];
+      if (currentIndex !== -1) {
+        updatedDirections.splice(currentIndex, 0, 'Write your direction here');
+      } else {
+        updatedDirections.push('Write your direction here');
+      }
+      return updatedDirections;
+    });
+
+    setChecklistOptions((prevChecklistOptions) => {
+      const updatedChecklistOptions = { ...prevChecklistOptions };
+      if (currentIndex !== -1) {
+        updatedChecklistOptions[newOption.id] = ['Option 1', 'Option 2'];
+      } else {
+        updatedChecklistOptions[newOption.id] = ['Option 1', 'Option 2'];
+      }
+      return updatedChecklistOptions;
+    });
   };
 
   const handleInstructionChange = (id: string, newInstruction: string) => {
@@ -156,6 +243,17 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         updatedInstructions[index] = newInstruction;
       }
       return updatedInstructions;
+    });
+  };
+
+  const handleTextChange = (id: string, newText: string) => {
+    setTexts((prevTexts) => {
+      const updatedTexts: string[] = [...prevTexts];
+      const index = options.findIndex((option) => option.id === id);
+      if (index !== -1) {
+        updatedTexts[index] = newText;
+      }
+      return updatedTexts;
     });
   };
 
@@ -193,21 +291,24 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const handleDeleteOption = (id: string, index?: number) => {
-    setOptions((prevOptions) => {
-      const updatedOptions = prevOptions.filter((option) => option.id !== id);
-      return updatedOptions;
-    });
+    setOptions((prevOptions) =>
+      prevOptions.filter((option) => option.id !== id)
+    );
 
-    setInstructions((prevInstructions) => {
-      const updatedInstructions = prevInstructions.filter(
-        (_, i) => i !== index
+    if (index !== undefined) {
+      setInstructions((prevInstructions) =>
+        prevInstructions.filter((_, i) => i !== index)
       );
-      return updatedInstructions;
-    });
-    setQuestions((prevQuestions) => {
-      const updatedQuestions = prevQuestions.filter((_, i) => i !== index);
-      return updatedQuestions;
-    });
+      setQuestions((prevQuestions) =>
+        prevQuestions.filter((_, i) => i !== index)
+      );
+      setTexts((prevTexts) => prevTexts.filter((_, i) => i !== index));
+      setHeaders((prevHeaders) => prevHeaders.filter((_, i) => i !== index));
+      setDirections((prevDirections) =>
+        prevDirections.filter((_, i) => i !== index)
+      );
+      setChecklistOptions(({ [id]: _, ...rest }) => rest);
+    }
   };
 
   const setShowDirectionsForChecklist = (id: string, show: boolean) => {
@@ -216,9 +317,31 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
       [id]: show,
     }));
   };
+
   const setBorderSize = (id: string, size: number) => {
     setBorderSizes((prevSizes) => ({
       ...prevSizes,
+      [id]: size,
+    }));
+  };
+
+  const setLineThickness = (id: string, size: number) => {
+    setLineThicknesses((prevThicknesses) => ({
+      ...prevThicknesses,
+      [id]: size,
+    }));
+  };
+
+  const setTopPadding = (id: string, size: number) => {
+    setTopPaddings((prevPaddings) => ({
+      ...prevPaddings,
+      [id]: size,
+    }));
+  };
+
+  const setBottomPadding = (id: string, size: number) => {
+    setBottomPaddings((prevPaddings) => ({
+      ...prevPaddings,
       [id]: size,
     }));
   };
@@ -283,16 +406,22 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
     <WorkSheetContext.Provider
       value={{
         borderSizes,
+        lineThicknesses,
         fontSizes,
         borderColors,
         borderStyles,
         answers,
+        topPaddings,
+        bottomPaddings,
         checklistOptions,
         columnNumbers,
         setBorderColor,
         textAlignments,
         setBorderSize,
         setFontSize,
+        setLineThickness,
+        setTopPadding,
+        setBottomPadding,
         setBorderStyle,
         setFontColor,
         setTextAlignment,
@@ -308,8 +437,10 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         handleQuestionChange,
         handleDirectionChange,
         handleHeaderChange,
+        handleTextChange,
         handleDeleteOption,
         setOptions,
+        texts,
         selectedOption,
         options,
         instructions,

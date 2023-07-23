@@ -1,4 +1,4 @@
-import { WorkSheetContext } from '@/pages/context/WorkSheetContext';
+import { WorkSheetContext } from '@/context/WorkSheetContext';
 import React, { useContext } from 'react';
 
 interface PageMultipleChoiceProps {

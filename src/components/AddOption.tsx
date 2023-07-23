@@ -1,4 +1,4 @@
-import { WorkSheetContext } from '@/pages/context/WorkSheetContext';
+import { WorkSheetContext } from '@/context/WorkSheetContext';
 import React, { useContext } from 'react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 
@@ -17,12 +17,15 @@ const AddOption = ({ id, toggleShowAddOption }: AddOptionProps) => {
         value={selectedOption}
         onChange={handleOptionChange}
       >
-        <option value='open-response'>Open Response</option>
+        <option value='instruction-box'>Instruction box</option>
         <option value='multiple-choice'>Multiple Choice</option>
         <option value='fill-in-the-blank'>Fill in the blank</option>
         <option value='checklist'>Checklist</option>
-        <option value='instruction-box'>Instruction box</option>
         <option value='section-header'>Section Header</option>
+        <option value='open-response'>Open Response</option>
+        <option value='word-bank'>Word Bank</option>
+        <option value='basic-text'>Basic Text</option>
+        <option value='divider'>Divider</option>
       </select>
       <button
         className='add-button bg-blue-500 text-white py-2 px-4  shadow hover:bg-blue-600'

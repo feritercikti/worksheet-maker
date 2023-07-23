@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import TextEditor from './TextEditor';
-import { WorkSheetContext } from '@/pages/context/WorkSheetContext';
+import { WorkSheetContext } from '@/context/WorkSheetContext';
 import { HexColorPicker } from 'react-colorful';
 
 import { MdDelete } from 'react-icons/md';
@@ -92,14 +92,14 @@ const InstructionBox = ({ id, index, onUpdate }: InstructionProps) => {
             </div>
             <div className='flex flex-col mx-6'>
               <h2 className='font-bold text-[14px]'>Border Style</h2>
-              <div className='gap-2 flex justify-between text-[13px]'>
+              <div className='flex w-full justify-between text-[13px]'>
                 <label>
                   Dashed
                   <div className='border-dashed border w-full h-[1px] my-1 border-black'></div>
                   <input
                     type='radio'
                     name={`border-${id}`}
-                    className='mx-2'
+                    className=' w-full'
                     checked={border === 'dashed'}
                     onChange={() => styleChanger('dashed')}
                   />
@@ -111,19 +111,19 @@ const InstructionBox = ({ id, index, onUpdate }: InstructionProps) => {
                     type='radio'
                     name={`border-${id}`}
                     checked={border === 'solid'}
-                    className='mx-2'
+                    className=' w-full'
                     onChange={() => styleChanger('solid')}
                   />
                 </label>
                 <label>
                   Dotted
-                  <div className='border-dotted border w-full h-[1px] my-1 border-black'></div>
+                  <div className='border-dotted  border w-full h-[1px] my-1 border-black'></div>
                   <input
                     type='radio'
                     name={`border-${id}`}
                     checked={border === 'dotted'}
                     onChange={() => styleChanger('dotted')}
-                    className='mx-2'
+                    className=' w-full'
                   />
                 </label>
                 <label>
@@ -134,7 +134,7 @@ const InstructionBox = ({ id, index, onUpdate }: InstructionProps) => {
                     name={`border-${id}`}
                     checked={border === 'double'}
                     onChange={() => styleChanger('double')}
-                    className='mx-2'
+                    className=' w-full'
                   />
                 </label>
               </div>

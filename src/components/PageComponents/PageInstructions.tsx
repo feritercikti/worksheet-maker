@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { WorkSheetContext } from '@/pages/context/WorkSheetContext';
+import { WorkSheetContext } from '@/context/WorkSheetContext';
 
 interface PageInstructionsProps {
   id: string;
