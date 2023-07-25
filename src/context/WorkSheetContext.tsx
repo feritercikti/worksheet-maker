@@ -25,6 +25,7 @@ interface WorkSheetContextProps {
   bottomPaddings: Record<string, number>;
   fontColors: Record<string, string>;
   answers: Record<string, string[]>;
+  words: Record<string, string[]>;
   checklistOptions: Record<string, string[]>;
   columnNumbers: Record<string, number>;
   showDirections: Record<string, boolean>;
@@ -41,6 +42,7 @@ interface WorkSheetContextProps {
   setBorderStyle: (id: string, style: string) => void;
   updateCheckList: (id: string, answers: string[]) => void;
   updateAnswers: (id: string, answers: string[]) => void;
+  updateWords: (id: string, answers: string[]) => void;
   updateColumnNumber: (id: string, columnNumber: number) => void;
   handleOptionChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   handleAddClick: (id: string) => void;
@@ -71,6 +73,7 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   topPaddings: {},
   bottomPaddings: {},
   answers: {},
+  words: {},
   checklistOptions: {},
   columnNumbers: {},
   showDirections: {},
@@ -86,6 +89,7 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   setTextAlignment: () => {},
   updateCheckList: () => {},
   updateAnswers: () => {},
+  updateWords: () => {},
   updateColumnNumber: () => {},
   handleOptionChange: () => {},
   handleAddClick: () => {},
@@ -124,6 +128,8 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
     {}
   );
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const [words, setWords] = useState<Record<string, string[]>>({});
+
   const [checklistOptions, setChecklistOptions] = useState<
     Record<string, string[]>
   >({});
@@ -388,6 +394,13 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const updateWords = (id: string, newWords: string[]) => {
+    setWords((prevWords) => ({
+      ...prevWords,
+      [id]: newWords,
+    }));
+  };
+
   const updateCheckList = (id: string, newOptions: string[]) => {
     setChecklistOptions((prevOptions) => ({
       ...prevOptions,
@@ -411,6 +424,7 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         borderColors,
         borderStyles,
         answers,
+        words,
         topPaddings,
         bottomPaddings,
         checklistOptions,
@@ -427,6 +441,7 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         setTextAlignment,
         fontColors,
         updateAnswers,
+        updateWords,
         updateColumnNumber,
         updateCheckList,
         showDirections,

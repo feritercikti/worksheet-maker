@@ -1,5 +1,6 @@
 import { WorkSheetContext } from '@/context/WorkSheetContext';
 import React, { useState, useContext } from 'react';
+import { HexColorPicker } from 'react-colorful';
 import { MdDelete } from 'react-icons/md';
 
 interface DividerProps {
@@ -9,6 +10,8 @@ interface DividerProps {
 
 const Divider = ({ id, index }: DividerProps) => {
   const [showPanel, setShowPanel] = useState(true);
+  const [color, setColor] = useState('#000000');
+  const [showPalette, setShowPalette] = useState(false);
 
   const {
     setBorderSize,
@@ -44,6 +47,11 @@ const Divider = ({ id, index }: DividerProps) => {
     setBorderStyle(id, style);
   };
 
+  const colorChanger = (newColor: string) => {
+    setColor(newColor);
+    setBorderColor(id, newColor);
+  };
+
   return (
     <div className='w-full  bg-white'>
       <div
@@ -53,7 +61,7 @@ const Divider = ({ id, index }: DividerProps) => {
         <h2 className='text-indigo-700 font-bold'>Divider</h2>
       </div>
       {showPanel && (
-        <div className='flex flex-col  py-3 gap-3'>
+        <div className='flex flex-col  py-3 gap-2'>
           <div className='mx-6 text-[14px] mt-2 gap-2 flex justify-between'>
             <div className='flex flex-col gap-2'>
               <h1 className='font-bold'>Divider Width</h1>
@@ -62,7 +70,6 @@ const Divider = ({ id, index }: DividerProps) => {
                 min='150'
                 max='750'
                 step={1}
-                // value={columnNumber}
                 defaultValue={150}
                 onChange={widthChanger}
                 className=''
@@ -75,7 +82,6 @@ const Divider = ({ id, index }: DividerProps) => {
                 min='1'
                 max='8'
                 step={1}
-                // value={columnNumber}
                 defaultValue={1}
                 onChange={thicknessChanger}
                 className=''
@@ -90,7 +96,6 @@ const Divider = ({ id, index }: DividerProps) => {
                 min='2'
                 max='30'
                 step={1}
-                // value={columnNumber}
                 defaultValue={2}
                 onChange={topPaddingChanger}
                 className=''
@@ -110,7 +115,7 @@ const Divider = ({ id, index }: DividerProps) => {
             </div>
           </div>
           <div className='flex flex-col mx-6'>
-            <h2 className='font-bold text-[14px]'>Border Style</h2>
+            <h2 className='font-bold text-[14px]'>Line Style</h2>
             <div className='flex w-full justify-between text-[13px]'>
               <label>
                 Dashed
@@ -153,6 +158,21 @@ const Divider = ({ id, index }: DividerProps) => {
                 />
               </label>
             </div>
+          </div>
+          <div className='flex flex-col gap-2 text-[14px] mx-6'>
+            <h2 className='font-bold'>Color</h2>
+            <div
+              className='p-1 w-fit rounded-[1px] border border-gray-400'
+              onClick={() => setShowPalette(!showPalette)}
+            >
+              <div
+                className=' w-10 h-6 border border-white '
+                style={{ backgroundColor: color }}
+              ></div>
+            </div>{' '}
+            {showPalette && (
+              <HexColorPicker color={color} onChange={colorChanger} />
+            )}
           </div>
         </div>
       )}

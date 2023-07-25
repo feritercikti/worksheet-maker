@@ -24,6 +24,8 @@ import BasicText from '@/components/BasicText';
 import PageBasicText from '@/components/PageComponents/PageBasicText';
 import Divider from '@/components/Divider';
 import PageDivider from '@/components/PageComponents/PageDivider';
+import WordBank from '@/components/WordBank';
+import PageWordBank from '@/components/PageComponents/PageWordBank';
 
 interface StudentInfo {
   name?: string;
@@ -277,6 +279,9 @@ const Worksheet = () => {
                 {option.optionType === 'open-response' && (
                   <OpenResponse id={option.id} index={index} key={option.id} />
                 )}
+                {option.optionType === 'word-bank' && (
+                  <WordBank id={option.id} index={index} key={option.id} />
+                )}
                 {option.optionType === 'fill-in-the-blank' && (
                   <FillBlank id={option.id} index={index} key={option.id} />
                 )}
@@ -399,6 +404,9 @@ const Worksheet = () => {
                   {option.optionType === 'open-response' && (
                     <PageOpenResponse key={option.id} />
                   )}
+                  {option.optionType === 'word-bank' && (
+                    <PageWordBank key={option.id} id={option.id} />
+                  )}
                   {option.optionType === 'fill-in-the-blank' && (
                     <PageFillBlank key={option.id} />
                   )}
@@ -431,11 +439,7 @@ const Worksheet = () => {
                     />
                   )}
                   {option.optionType === 'divider' && (
-                    <PageDivider
-                      id={option.id}
-                      // text={texts[index]}
-                      key={option.id}
-                    />
+                    <PageDivider id={option.id} key={option.id} />
                   )}
                 </div>
               );

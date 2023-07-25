@@ -3,7 +3,6 @@ import React, { useContext } from 'react';
 
 interface PageDividerProps {
   id: string;
-  // index: number;
 }
 
 const getPageDividerBorderStyle = (style: string) => {
@@ -39,10 +38,8 @@ const PageDivider = ({ id }: PageDividerProps) => {
   const borderStyle = borderStyles[id] || 'solid';
 
   return (
-    <div className='w-full flex items-center justify-center '>
+    <div className='w-full mt-3  flex items-center justify-center '>
       <div
-        className={` mt-3  
-      `}
         style={{
           marginTop: `${topPadding}px`,
           marginBottom: `${bottomPadding}px`,
