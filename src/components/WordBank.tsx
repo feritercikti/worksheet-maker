@@ -2,7 +2,7 @@ import { WorkSheetContext } from '@/context/WorkSheetContext';
 import React, { useState, useContext, useMemo } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { MdDelete } from 'react-icons/md';
-import { PiDotsThreeCircleDuotone } from 'react-icons/pi';
+import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 
 interface WordBankProps {
   id: string;
@@ -27,8 +27,6 @@ const WordBank = ({ id, index }: WordBankProps) => {
   const [sortingOption, setSortingOption] = useState('');
   const [textCaseOption, setTextCaseOption] = useState('');
 
-  const originalWords = words[id];
-
   const currentWords = useMemo(() => {
     return words[id] || [];
   }, [words, id]);
@@ -49,6 +47,8 @@ const WordBank = ({ id, index }: WordBankProps) => {
         const j = Math.floor(Math.random() * (i + 1));
         [sortedWords[i], sortedWords[j]] = [sortedWords[j], sortedWords[i]];
       }
+    } else {
+      return;
     }
 
     updateWords(id, sortedWords);
@@ -74,6 +74,8 @@ const WordBank = ({ id, index }: WordBankProps) => {
       modifiedWords = currentWords.map((word) => word.toUpperCase());
     } else if (selectedOption === 'lowercase') {
       modifiedWords = currentWords.map((word) => word.toLowerCase());
+    } else {
+      return;
     }
     updateWords(id, modifiedWords || []);
   };
@@ -151,6 +153,7 @@ const WordBank = ({ id, index }: WordBankProps) => {
                   value={sortingOption}
                   onChange={handleSortingOptionChange}
                 >
+                  <option value=''>Choose Option</option>
                   <option value='alphabetically'>Alphabetically</option>
                   <option value='random'>Random</option>
                 </select>
@@ -162,6 +165,7 @@ const WordBank = ({ id, index }: WordBankProps) => {
                   value={textCaseOption}
                   onChange={handleTextCaseOptionChange}
                 >
+                  <option value=''>Choose Option</option>
                   <option value='title-case'>Title Case</option>
                   <option value='uppercase'>UPPERCASE</option>
                   <option value='lowercase'>lowercase</option>
@@ -169,11 +173,12 @@ const WordBank = ({ id, index }: WordBankProps) => {
               </div>
             </div>
             <div className='my-2 flex w-full items-center justify-center'>
-              <PiDotsThreeCircleDuotone
-                size={25}
-                className='cursor-pointer'
-                onClick={() => setExtraOptions(!extraOptions)}
-              />
+              <button onClick={() => setExtraOptions(!extraOptions)}>
+                <HiOutlineDotsCircleHorizontal
+                  size={25}
+                  className='cursor-pointer hover:text-gray-600'
+                />
+              </button>
             </div>
             {extraOptions && (
               <>

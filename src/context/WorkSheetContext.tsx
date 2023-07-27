@@ -24,8 +24,11 @@ interface WorkSheetContextProps {
   topPaddings: Record<string, number>;
   bottomPaddings: Record<string, number>;
   fontColors: Record<string, string>;
+  fillwords: Record<string, { words: string[]; hidden: boolean[] }>;
+  setHiddenWords: (id: string, newHidden: boolean[]) => void;
   answers: Record<string, string[]>;
   words: Record<string, string[]>;
+  hiddenWords: Record<string, boolean[]>;
   checklistOptions: Record<string, string[]>;
   columnNumbers: Record<string, number>;
   showDirections: Record<string, boolean>;
@@ -74,6 +77,9 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   bottomPaddings: {},
   answers: {},
   words: {},
+  fillwords: {},
+  hiddenWords: {},
+  setHiddenWords: () => {},
   checklistOptions: {},
   columnNumbers: {},
   showDirections: {},
@@ -129,6 +135,9 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   );
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [words, setWords] = useState<Record<string, string[]>>({});
+  const [fillwords, setFillWords] = useState<
+    Record<string, { words: string[]; hidden: boolean[] }>
+  >({});
 
   const [checklistOptions, setChecklistOptions] = useState<
     Record<string, string[]>
@@ -150,6 +159,9 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   const [texts, setTexts] = useState<string[]>([]);
 
   const [headers, setHeaders] = useState<string[]>([]);
+  const [hiddenWordsState, setHiddenWordsState] = useState<
+    Record<string, boolean[]>
+  >({});
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -401,6 +413,16 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const setHiddenWords = (id: string, newHidden: boolean[]) => {
+    setFillWords((prevFillWords) => ({
+      ...prevFillWords,
+      [id]: {
+        words: prevFillWords[id]?.words || [],
+        hidden: newHidden,
+      },
+    }));
+  };
+
   const updateCheckList = (id: string, newOptions: string[]) => {
     setChecklistOptions((prevOptions) => ({
       ...prevOptions,
@@ -418,6 +440,9 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   return (
     <WorkSheetContext.Provider
       value={{
+        fillwords,
+        hiddenWords: hiddenWordsState,
+        setHiddenWords,
         borderSizes,
         lineThicknesses,
         fontSizes,

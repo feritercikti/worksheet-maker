@@ -408,7 +408,11 @@ const Worksheet = () => {
                     <PageWordBank key={option.id} id={option.id} />
                   )}
                   {option.optionType === 'fill-in-the-blank' && (
-                    <PageFillBlank key={option.id} />
+                    <PageFillBlank
+                      key={option.id}
+                      id={option.id}
+                      index={index}
+                    />
                   )}
                   {option.optionType === 'checklist' && (
                     <PageCheckList
