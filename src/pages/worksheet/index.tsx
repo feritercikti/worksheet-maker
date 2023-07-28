@@ -391,6 +391,11 @@ const Worksheet = () => {
                 options.filter(
                   (opt, idx) => idx < index && opt.optionType === 'checklist'
                 ).length + 1;
+              const fillBlankIndex =
+                options.filter(
+                  (opt, idx) =>
+                    idx < index && opt.optionType === 'fill-in-the-blank'
+                ).length + 1;
               return (
                 <div key={option.id} className='break-words mt-4'>
                   {option.optionType === 'multiple-choice' && (
@@ -411,7 +416,7 @@ const Worksheet = () => {
                     <PageFillBlank
                       key={option.id}
                       id={option.id}
-                      index={index}
+                      index={fillBlankIndex}
                     />
                   )}
                   {option.optionType === 'checklist' && (

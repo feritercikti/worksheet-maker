@@ -16,6 +16,8 @@ type TextAlign =
   | 'match-parent';
 
 interface WorkSheetContextProps {
+  letterBlanks: Record<string, boolean>;
+  setLetterBlanks: (id: string, isOpen: boolean) => void;
   borderSizes: Record<string, number>;
   fontSizes: Record<string, number>;
   borderColors: Record<string, string>;
@@ -66,6 +68,8 @@ interface WorkSheetContextProps {
 }
 
 export const WorkSheetContext = createContext<WorkSheetContextProps>({
+  letterBlanks: {},
+  setLetterBlanks: () => {},
   borderSizes: {},
   fontSizes: {},
   borderColors: {},
@@ -162,6 +166,8 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   const [hiddenWordsState, setHiddenWordsState] = useState<
     Record<string, boolean[]>
   >({});
+
+  const [letterBlanks, setLetterBlanks] = useState<Record<string, boolean>>({});
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -437,9 +443,18 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const handleSetLetterBlanks = (id: string, isOpen: boolean) => {
+    setLetterBlanks((prevLetterBlanks) => ({
+      ...prevLetterBlanks,
+      [id]: isOpen,
+    }));
+  };
+
   return (
     <WorkSheetContext.Provider
       value={{
+        letterBlanks,
+        setLetterBlanks: handleSetLetterBlanks,
         fillwords,
         hiddenWords: hiddenWordsState,
         setHiddenWords,

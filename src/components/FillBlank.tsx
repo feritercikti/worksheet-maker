@@ -1,5 +1,5 @@
 import { WorkSheetContext } from '@/context/WorkSheetContext';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
 interface FillBlankProps {
   id: string;
@@ -8,15 +8,30 @@ interface FillBlankProps {
 
 const FillBlank = ({ id, index }: FillBlankProps) => {
   const [showPanel, setShowPanel] = useState(true);
+  const [isChecked, setIsChecked] = useState(false);
 
-  const { fillwords, words, updateWords, setHiddenWords, hiddenWords } =
-    useContext(WorkSheetContext);
+  const {
+    fillwords,
+    words,
+    updateWords,
+    setHiddenWords,
+    hiddenWords,
+    letterBlanks,
+    setLetterBlanks,
+  } = useContext(WorkSheetContext);
 
   const currentWords = words[id] || [];
 
   const [inputWord, setInputWord] = useState('');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleToggleLetterBlanks = () => {
+    // Use the `setLetterBlanks` function from the context to toggle the state
+    setLetterBlanks(id, !letterBlanks[id]);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputWord(e.target.value);
     // Instantly update currentWords with the input value (separated by spaces)
     const wordsArray = e.target.value.split(' ').filter(Boolean);
@@ -30,6 +45,14 @@ const FillBlank = ({ id, index }: FillBlankProps) => {
     newHiddenWords[wordIndex] = !newHiddenWords[wordIndex];
     setHiddenWords(id, newHiddenWords);
   };
+
+  useEffect(() => {
+    // Resize the textarea to fit its content
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    }
+  }, [inputWord]);
 
   return (
     <div className='w-full  bg-white'>
@@ -62,12 +85,36 @@ const FillBlank = ({ id, index }: FillBlankProps) => {
             </div>
           </div>
           <div key={index} className=' '>
-            <input
-              className='w-full border-2 py-1 px-2 text-gray-800 placeholder-gray-400 focus-within:outline-gray-400'
+            <textarea
+              ref={inputRef}
+              className=' w-full border-2 py-1 px-2 text-gray-800 placeholder-gray-400 focus-within:outline-gray-400 resize-none overflow-y-hidden'
               value={inputWord}
               onChange={handleInputChange}
             />
           </div>
+          <label className='flex items-center cursor-pointer'>
+            <div className='relative w-10 h-4'>
+              <input
+                type='checkbox'
+                className='sr-only'
+                checked={letterBlanks[id]}
+                onChange={handleToggleLetterBlanks}
+              />
+              <div
+                className={`w-full h-full rounded-full shadow-inner ${
+                  letterBlanks[id] ? 'bg-indigo-400' : 'bg-gray-300 '
+                }`}
+              ></div>
+              <div
+                className={`absolute left-0 top-0 w-4 h-4  rounded-full shadow-md transform transition-transform ${
+                  letterBlanks[id]
+                    ? 'translate-x-6 bg-white border border-gray-400'
+                    : 'translate-x-0 bg-gray-400'
+                }`}
+              ></div>
+            </div>
+            <span className='ml-2 text-gray-700'>Letter Blanks</span>
+          </label>
         </div>
       )}
     </div>
