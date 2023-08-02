@@ -1,10 +1,11 @@
+import { WorkSheetContext } from '@/context/WorkSheetContext';
 import Image from 'next/image';
-import React from 'react';
+import React, { useContext } from 'react';
 import { BsGithub } from 'react-icons/bs';
 
 const Header = () => {
   return (
-    <div className='flex w-full justify-between bg-[#4f40ae] top-0 sticky'>
+    <div className='flex w-full justify-between z-[99] bg-[#4f40ae] top-0 sticky'>
       <div className=' flex  items-center px-5 my-2 gap-3'>
         <Image
           src='/worksheeticon.png'

@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import TextEditor from './TextEditor';
 import { WorkSheetContext } from '@/context/WorkSheetContext';
 import { HexColorPicker } from 'react-colorful';
-
 import { MdDelete } from 'react-icons/md';
 
 interface InstructionProps {

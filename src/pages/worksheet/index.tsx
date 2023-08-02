@@ -53,8 +53,11 @@ const Worksheet = () => {
     headers,
     questions,
     directions,
+    prompts,
     texts,
     handleAddClick,
+    answerKey,
+    setAnswerKey,
   } = useContext(WorkSheetContext);
 
   const [showHeader, setShowHeader] = useState(true);
@@ -131,7 +134,30 @@ const Worksheet = () => {
   return (
     <>
       <Header />
-      <div className='flex  mt-10 mx-10 justify-center gap-10'>
+      <label className='flex w-fit mt-5   mx-12 items-center cursor-pointer top-[90px] sticky'>
+        <div className='relative w-10 h-4'>
+          <input
+            type='checkbox'
+            className='sr-only'
+            checked={answerKey}
+            onChange={() => setAnswerKey(!answerKey)}
+          />
+          <div
+            className={`w-full h-full rounded-full shadow-inner ${
+              answerKey ? 'bg-indigo-400' : 'bg-gray-200 '
+            }`}
+          ></div>
+          <div
+            className={`absolute left-0 top-0 w-4 h-4  rounded-full shadow-md transform transition-transform ${
+              answerKey
+                ? 'translate-x-6 bg-white border border-gray-400'
+                : 'translate-x-0 bg-gray-500'
+            }`}
+          ></div>
+        </div>
+        <span className='ml-2 text-white'>Answer Key</span>
+      </label>
+      <div className='flex  mt-5 mx-10 justify-center gap-10'>
         <div className='flex-[1.2_1.2_0%] mb-5  h-[600px]  overflow-y-auto px-2  top-[87px] sticky scrollbar'>
           <div className='w-full mb-5 bg-white'>
             <div
@@ -341,6 +367,9 @@ const Worksheet = () => {
 
         <div className='flex-[3_3_0%] flex '>
           <div className='flex flex-col h-[900px] mb-20 gap-2 ml-12 bg-white w-[800px] p-10 '>
+            {answerKey && (
+              <h1 className='text-center text-red-500 text-2xl'>ANSWER KEY</h1>
+            )}
             <div className='flex justify-between w-full flex-end'>
               <div className='flex-1 break-words w-[330px]'>
                 {showTitle && (
@@ -396,6 +425,12 @@ const Worksheet = () => {
                   (opt, idx) =>
                     idx < index && opt.optionType === 'fill-in-the-blank'
                 ).length + 1;
+
+              const openresponseIndex =
+                options.filter(
+                  (opt, idx) =>
+                    idx < index && opt.optionType === 'open-response'
+                ).length + 1;
               return (
                 <div key={option.id} className='break-words mt-4'>
                   {option.optionType === 'multiple-choice' && (
@@ -407,7 +442,11 @@ const Worksheet = () => {
                     />
                   )}
                   {option.optionType === 'open-response' && (
-                    <PageOpenResponse key={option.id} />
+                    <PageOpenResponse
+                      key={option.id}
+                      prompt={prompts[index]}
+                      id={option.id}
+                    />
                   )}
                   {option.optionType === 'word-bank' && (
                     <PageWordBank key={option.id} id={option.id} />

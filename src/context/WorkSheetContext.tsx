@@ -16,6 +16,8 @@ type TextAlign =
   | 'match-parent';
 
 interface WorkSheetContextProps {
+  answerType: Record<string, string>;
+  setAnswerType: (id: string, type: string) => void;
   letterBlanks: Record<string, boolean>;
   setLetterBlanks: (id: string, isOpen: boolean) => void;
   borderSizes: Record<string, number>;
@@ -52,8 +54,9 @@ interface WorkSheetContextProps {
   handleOptionChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   handleAddClick: (id: string) => void;
   handleInstructionChange: (id: string, newInstruction: string) => void;
-  handleTextChange: (id: string, newInstruction: string) => void;
+  handleTextChange: (id: string, newText: string) => void;
   handleQuestionChange: (id: string, newQuestion: string) => void;
+  handlePromptChange: (id: string, newPrompt: string) => void;
   handleDirectionChange: (id: string, newDirection: string) => void;
   handleHeaderChange: (id: string, newHeader: string) => void;
   handleDeleteOption: (id: string, index?: number) => void;
@@ -62,12 +65,17 @@ interface WorkSheetContextProps {
   setOptions: React.Dispatch<React.SetStateAction<Option[]>>;
   instructions: string[];
   questions: string[];
+  prompts: string[];
   directions: string[];
   texts: string[];
   headers: string[];
+  answerKey: boolean;
+  setAnswerKey: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const WorkSheetContext = createContext<WorkSheetContextProps>({
+  answerType: {},
+  setAnswerType: () => {},
   letterBlanks: {},
   setLetterBlanks: () => {},
   borderSizes: {},
@@ -106,6 +114,7 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   handleInstructionChange: () => {},
   handleTextChange: () => {},
   handleQuestionChange: () => {},
+  handlePromptChange: () => {},
   handleDirectionChange: () => {},
   handleHeaderChange: () => {},
   handleDeleteOption: () => {},
@@ -114,9 +123,12 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   setOptions: () => {},
   instructions: [],
   questions: [],
+  prompts: [],
   directions: [],
   texts: [],
   headers: [],
+  answerKey: false,
+  setAnswerKey: () => {},
 });
 
 export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
@@ -160,6 +172,7 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   const [instructions, setInstructions] = useState<string[]>([]);
   const [questions, setQuestions] = useState<string[]>([]);
   const [directions, setDirections] = useState<string[]>([]);
+  const [prompts, setPrompts] = useState<string[]>([]);
   const [texts, setTexts] = useState<string[]>([]);
 
   const [headers, setHeaders] = useState<string[]>([]);
@@ -168,6 +181,11 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   >({});
 
   const [letterBlanks, setLetterBlanks] = useState<Record<string, boolean>>({});
+  const [answerKey, setAnswerKey] = useState<boolean>(false);
+
+  const [answerTypeState, setAnswerTypeState] = useState<
+    Record<string, string>
+  >({});
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -248,6 +266,16 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
       return updatedDirections;
     });
 
+    setPrompts((prevPrompts) => {
+      const updatedPrompts = [...prevPrompts];
+      if (currentIndex !== -1) {
+        updatedPrompts.splice(currentIndex, 0, 'Write your prompt here');
+      } else {
+        updatedPrompts.push('Write your prompt here');
+      }
+      return updatedPrompts;
+    });
+
     setChecklistOptions((prevChecklistOptions) => {
       const updatedChecklistOptions = { ...prevChecklistOptions };
       if (currentIndex !== -1) {
@@ -289,6 +317,17 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         updatedQuestions[index] = newQuestion;
       }
       return updatedQuestions;
+    });
+  };
+
+  const handlePromptChange = (id: string, newPrompt: string) => {
+    setPrompts((prevPrompts) => {
+      const updatedPrompts: string[] = [...prevPrompts];
+      const index = options.findIndex((option) => option.id === id);
+      if (index !== -1) {
+        updatedPrompts[index] = newPrompt;
+      }
+      return updatedPrompts;
     });
   };
 
@@ -450,9 +489,20 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const setAnswerType = (id: string, type: string) => {
+    setAnswerTypeState((prev) => ({
+      ...prev,
+      [id]: type,
+    }));
+  };
+
   return (
     <WorkSheetContext.Provider
       value={{
+        answerType: answerTypeState,
+        setAnswerType,
+        answerKey,
+        setAnswerKey,
         letterBlanks,
         setLetterBlanks: handleSetLetterBlanks,
         fillwords,
@@ -491,6 +541,7 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         handleInstructionChange,
         handleQuestionChange,
         handleDirectionChange,
+        handlePromptChange,
         handleHeaderChange,
         handleTextChange,
         handleDeleteOption,
@@ -499,6 +550,7 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         selectedOption,
         options,
         instructions,
+        prompts,
         headers,
         questions,
         directions,

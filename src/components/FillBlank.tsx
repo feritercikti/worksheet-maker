@@ -1,5 +1,6 @@
 import { WorkSheetContext } from '@/context/WorkSheetContext';
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { MdDelete } from 'react-icons/md';
 
 interface FillBlankProps {
   id: string;
@@ -8,19 +9,28 @@ interface FillBlankProps {
 
 const FillBlank = ({ id, index }: FillBlankProps) => {
   const [showPanel, setShowPanel] = useState(true);
-  const [isChecked, setIsChecked] = useState(false);
+  const [answerTypeLocal, setAnswerTypeLocal] = useState('none');
 
   const {
+    setAnswerType,
     fillwords,
     words,
     updateWords,
     setHiddenWords,
-    hiddenWords,
     letterBlanks,
     setLetterBlanks,
+    handleDeleteOption,
+    columnNumbers,
+    updateColumnNumber,
+    answers,
+    updateAnswers,
   } = useContext(WorkSheetContext);
 
   const currentWords = words[id] || [];
+
+  const columnNumber = columnNumbers[id] || 1;
+
+  const currentAnswers = answers[id] || [];
 
   const [inputWord, setInputWord] = useState('');
 
@@ -44,6 +54,35 @@ const FillBlank = ({ id, index }: FillBlankProps) => {
     const newHiddenWords = [...currentFillWords.hidden];
     newHiddenWords[wordIndex] = !newHiddenWords[wordIndex];
     setHiddenWords(id, newHiddenWords);
+  };
+
+  const handleAnswerTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newAnswerType = e.target.value;
+    setAnswerTypeLocal(newAnswerType); // Update the answerType state locally
+    setAnswerType(id, newAnswerType); // Update the answerType in the context
+  };
+
+  const handleAnswerChange = (index: number, value: string) => {
+    const updatedAnswers = [...currentAnswers];
+    updatedAnswers[index] = value;
+    updateAnswers(id, updatedAnswers);
+  };
+
+  const handleDeleteAnswer = (index: number) => {
+    const updatedAnswers = [...currentAnswers];
+    updatedAnswers.splice(index, 1);
+    updateAnswers(id, updatedAnswers);
+  };
+
+  const handleAddAnswer = () => {
+    const newAnswer = '';
+    const updatedAnswers = [...currentAnswers, newAnswer];
+    updateAnswers(id, updatedAnswers);
+  };
+
+  const handleColumnNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColumnNumber = parseInt(e.target.value);
+    updateColumnNumber(id, newColumnNumber);
   };
 
   useEffect(() => {
@@ -92,7 +131,7 @@ const FillBlank = ({ id, index }: FillBlankProps) => {
               onChange={handleInputChange}
             />
           </div>
-          <label className='flex items-center cursor-pointer'>
+          <label className='flex w-fit items-center cursor-pointer'>
             <div className='relative w-10 h-4'>
               <input
                 type='checkbox'
@@ -113,10 +152,77 @@ const FillBlank = ({ id, index }: FillBlankProps) => {
                 }`}
               ></div>
             </div>
-            <span className='ml-2 text-gray-700'>Letter Blanks</span>
+            <span className='ml-2 '>Letter Blanks</span>
           </label>
+          <div className='mt-2 w-[70%]'>
+            <h1 className='text-[13px] font-bold mb-2'>Answer Type</h1>
+            <select
+              className='select-dropdown w-full mt-1 bg-white border border-gray-300 py-2 px-4  shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              value={answerTypeLocal}
+              onChange={handleAnswerTypeChange}
+            >
+              <option value='none'>None</option>
+              <option value='blank'>Blank</option>
+              <option value='multiple-choice'>Multiple Choice</option>
+            </select>
+          </div>
+          {answerTypeLocal === 'multiple-choice' && (
+            <div className='flex flex-col  py-3 gap-3'>
+              <h1 className='text-[14px] font-bold '>Answer Options</h1>
+              {currentAnswers.map((answer, index) => (
+                <div key={index} className='relative '>
+                  <input
+                    className='w-full border-2 h-8 px-2 text-gray-800 placeholder-gray-400 focus-within:outline-gray-400'
+                    value={answer}
+                    placeholder='Option'
+                    onChange={(e) => handleAnswerChange(index, e.target.value)}
+                  />
+                  <MdDelete
+                    size={25}
+                    className='hover:bg-gray-200 h-full absolute cursor-pointer right-0 top-1/2 transform -translate-y-1/2'
+                    onClick={() => handleDeleteAnswer(index)}
+                  />
+                </div>
+              ))}
+              <button
+                onClick={handleAddAnswer}
+                className='px-2 py-1  bg-green-800 text-white'
+              >
+                Add New Option
+              </button>
+              <div
+                className='
+               text-[14px] mt-2 gap-2 flex flex-col'
+              >
+                <div className='flex justify-between '>
+                  <h1 className='font-bold'>Number of Columns</h1>
+                  <p>{columnNumber}</p>
+                </div>
+                <input
+                  type='range'
+                  min='1'
+                  max='4'
+                  step={1}
+                  value={columnNumber}
+                  defaultValue={1}
+                  onChange={handleColumnNumberChange}
+                  className=''
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
+      <div className='w-full flex flex-col '>
+        <span className='w-full bg-gray-300 h-[1px]'></span>
+        <div className='w-full flex justify-end'>
+          <MdDelete
+            size={25}
+            className=' text-red-500  m-2 cursor-pointer hover:text-red-800 '
+            onClick={() => handleDeleteOption(id, index)}
+          />
+        </div>
+      </div>
     </div>
   );
 };
