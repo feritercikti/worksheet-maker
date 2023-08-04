@@ -2,22 +2,20 @@ import React, { useContext, useState } from 'react';
 import TextEditor from './TextEditor';
 import { MdDelete } from 'react-icons/md';
 import { WorkSheetContext } from '@/context/WorkSheetContext';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
-import AddOption from './AddOption';
 
 interface MultipleChoiceProps {
   id: string;
   index: number;
-  onUpdate: (id: string, newQuestion: string) => void;
 }
 
-const MultipleChoice = ({ id, onUpdate, index }: MultipleChoiceProps) => {
+const MultipleChoice = ({ id, index }: MultipleChoiceProps) => {
   const {
     answers,
     updateAnswers,
     columnNumbers,
     updateColumnNumber,
     handleDeleteOption,
+    handleTextChange,
   } = useContext(WorkSheetContext);
 
   const currentAnswers = answers[id] || [];
@@ -29,7 +27,7 @@ const MultipleChoice = ({ id, onUpdate, index }: MultipleChoiceProps) => {
 
   const handleQuestionChange = (newQuestion: string) => {
     setQuestion(newQuestion);
-    onUpdate(id, newQuestion);
+    handleTextChange(id, newQuestion);
   };
 
   const handleAnswerChange = (index: number, value: string) => {

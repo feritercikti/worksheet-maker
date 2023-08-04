@@ -19,7 +19,7 @@ const Checklist = ({ id, index }: ChecklistProps) => {
     updateCheckList,
     showDirections,
     setShowDirections,
-    handleDirectionChange,
+    handleTextChange,
     handleDeleteOption,
   } = useContext(WorkSheetContext);
 
@@ -31,7 +31,7 @@ const Checklist = ({ id, index }: ChecklistProps) => {
 
   const handleDirectionChanged = (newDirection: string) => {
     setDirection(newDirection);
-    handleDirectionChange(id, newDirection);
+    handleTextChange(id, newDirection);
   };
 
   const handleOptionChange = (index: number, value: string) => {

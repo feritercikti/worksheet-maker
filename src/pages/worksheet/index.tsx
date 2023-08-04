@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useMemo, useState, useContext } from 'react';
+import React, { useMemo, useState, useContext, useRef } from 'react';
 import { MdDelete } from 'react-icons/md';
 import { HexColorPicker } from 'react-colorful';
 import FontSizeChanger from '@/components/FontSizeChanger';
@@ -26,6 +26,8 @@ import Divider from '@/components/Divider';
 import PageDivider from '@/components/PageComponents/PageDivider';
 import WordBank from '@/components/WordBank';
 import PageWordBank from '@/components/PageComponents/PageWordBank';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface StudentInfo {
   name?: string;
@@ -45,15 +47,8 @@ const Worksheet = () => {
 
   const {
     handleOptionChange,
-    handleInstructionChange,
-    handleQuestionChange,
     selectedOption,
     options,
-    instructions,
-    headers,
-    questions,
-    directions,
-    prompts,
     texts,
     handleAddClick,
     answerKey,
@@ -73,6 +68,8 @@ const Worksheet = () => {
   const [showAddOption, setShowAddOption] = useState<ShowAddOptionState>({});
   const [showTitle, setShowTitle] = useState(true);
   const [showStudentInfo, setShowStudentInfo] = useState(true);
+
+  const pdfRef = useRef<HTMLDivElement | null>(null);
 
   const modules = {
     toolbar: [['bold', 'italic', 'underline']],
@@ -131,6 +128,40 @@ const Worksheet = () => {
     });
   };
 
+  const generatePDF = async () => {
+    if (pdfRef.current) {
+      const pdf = new jsPDF('p', 'mm', 'a4'); // Specify page dimensions
+
+      // Capture the content as a canvas
+      const canvas = await html2canvas(pdfRef.current);
+
+      // Calculate the aspect ratio to fit content within the PDF page
+      const contentWidth = canvas.width;
+      const contentHeight = canvas.height;
+      const pageAspectRatio =
+        pdf.internal.pageSize.getWidth() / pdf.internal.pageSize.getHeight();
+      const contentAspectRatio = contentWidth / contentHeight;
+
+      let pdfWidth;
+      let pdfHeight;
+      if (contentAspectRatio > pageAspectRatio) {
+        pdfWidth = pdf.internal.pageSize.getWidth();
+        pdfHeight =
+          (contentHeight * pdf.internal.pageSize.getWidth()) / contentWidth;
+      } else {
+        pdfHeight = pdf.internal.pageSize.getHeight();
+        pdfWidth =
+          (contentWidth * pdf.internal.pageSize.getHeight()) / contentHeight;
+      }
+
+      // Add the canvas to the PDF
+      pdf.addImage(canvas, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Save the PDF
+      pdf.save('document.pdf');
+    }
+  };
+
   return (
     <>
       <Header />
@@ -157,6 +188,12 @@ const Worksheet = () => {
         </div>
         <span className='ml-2 text-white'>Answer Key</span>
       </label>
+      <button
+        onClick={generatePDF}
+        className='bg-white mx-12 w-fit mt-2 rounded px-2 py-2'
+      >
+        Click to Generate PDF
+      </button>
       <div className='flex  mt-5 mx-10 justify-center gap-10'>
         <div className='flex-[1.2_1.2_0%] mb-5  h-[600px]  overflow-y-auto px-2  top-[87px] sticky scrollbar'>
           <div className='w-full mb-5 bg-white'>
@@ -297,7 +334,6 @@ const Worksheet = () => {
                 {option.optionType === 'multiple-choice' && (
                   <MultipleChoice
                     id={option.id}
-                    onUpdate={handleQuestionChange}
                     index={index}
                     key={option.id}
                   />
@@ -317,7 +353,6 @@ const Worksheet = () => {
                 {option.optionType === 'instruction-box' && (
                   <InstructionBox
                     id={option.id}
-                    onUpdate={handleInstructionChange}
                     index={index}
                     key={option.id}
                   />
@@ -365,7 +400,7 @@ const Worksheet = () => {
           </div>
         </div>
 
-        <div className='flex-[3_3_0%] flex '>
+        <div className='flex-[3_3_0%] flex ' ref={pdfRef}>
           <div className='flex flex-col h-[900px] mb-20 gap-2 ml-12 bg-white w-[800px] p-10 '>
             {answerKey && (
               <h1 className='text-center text-red-500 text-2xl'>ANSWER KEY</h1>
@@ -431,11 +466,12 @@ const Worksheet = () => {
                   (opt, idx) =>
                     idx < index && opt.optionType === 'open-response'
                 ).length + 1;
+
               return (
                 <div key={option.id} className='break-words mt-4'>
                   {option.optionType === 'multiple-choice' && (
                     <PageMultipleChoice
-                      question={questions[index]}
+                      question={texts[index]}
                       id={option.id}
                       index={multipleChoiceIndex}
                       key={option.id}
@@ -444,8 +480,9 @@ const Worksheet = () => {
                   {option.optionType === 'open-response' && (
                     <PageOpenResponse
                       key={option.id}
-                      prompt={prompts[index]}
+                      prompt={texts[index]}
                       id={option.id}
+                      index={openresponseIndex}
                     />
                   )}
                   {option.optionType === 'word-bank' && (
@@ -460,7 +497,7 @@ const Worksheet = () => {
                   )}
                   {option.optionType === 'checklist' && (
                     <PageCheckList
-                      direction={directions[index]}
+                      direction={texts[index]}
                       id={option.id}
                       index={checkListIndex}
                       key={option.id}
@@ -468,14 +505,14 @@ const Worksheet = () => {
                   )}
                   {option.optionType === 'instruction-box' && (
                     <PageInstructions
-                      instruction={instructions[index]}
+                      instruction={texts[index]}
                       id={option.id}
                     />
                   )}
                   {option.optionType === 'section-header' && (
                     <PageSectionHeader
                       id={option.id}
-                      header={headers[index]}
+                      header={texts[index]}
                       key={option.id}
                     />
                   )}

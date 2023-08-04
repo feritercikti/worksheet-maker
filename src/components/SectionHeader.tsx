@@ -28,7 +28,7 @@ const SectionHeader = ({ id, index }: SectionHeaderProps) => {
     setFontSize,
     fontSizes,
     setTextAlignment,
-    handleHeaderChange,
+    handleTextChange,
   } = useContext(WorkSheetContext);
   const [color, setColor] = useState('#000000');
   const [showPalette, setShowPalette] = useState(false);
@@ -37,7 +37,7 @@ const SectionHeader = ({ id, index }: SectionHeaderProps) => {
 
   const handleHeaderChanged = (newHeader: string) => {
     setHeader(newHeader);
-    handleHeaderChange(id, newHeader);
+    handleTextChange(id, newHeader);
   };
 
   const colorChanger = (newColor: string) => {

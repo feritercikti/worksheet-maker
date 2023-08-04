@@ -16,6 +16,8 @@ type TextAlign =
   | 'match-parent';
 
 interface WorkSheetContextProps {
+  numberOfLines: Record<string, number>;
+  setNumberOfLines: (id: string, numberOfLines: number) => void;
   answerType: Record<string, string>;
   setAnswerType: (id: string, type: string) => void;
   letterBlanks: Record<string, boolean>;
@@ -53,27 +55,19 @@ interface WorkSheetContextProps {
   updateColumnNumber: (id: string, columnNumber: number) => void;
   handleOptionChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   handleAddClick: (id: string) => void;
-  handleInstructionChange: (id: string, newInstruction: string) => void;
   handleTextChange: (id: string, newText: string) => void;
-  handleQuestionChange: (id: string, newQuestion: string) => void;
-  handlePromptChange: (id: string, newPrompt: string) => void;
-  handleDirectionChange: (id: string, newDirection: string) => void;
-  handleHeaderChange: (id: string, newHeader: string) => void;
   handleDeleteOption: (id: string, index?: number) => void;
   selectedOption: string;
   options: Option[];
   setOptions: React.Dispatch<React.SetStateAction<Option[]>>;
-  instructions: string[];
-  questions: string[];
-  prompts: string[];
-  directions: string[];
   texts: string[];
-  headers: string[];
   answerKey: boolean;
   setAnswerKey: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const WorkSheetContext = createContext<WorkSheetContextProps>({
+  numberOfLines: {},
+  setNumberOfLines: () => {},
   answerType: {},
   setAnswerType: () => {},
   letterBlanks: {},
@@ -111,22 +105,12 @@ export const WorkSheetContext = createContext<WorkSheetContextProps>({
   updateColumnNumber: () => {},
   handleOptionChange: () => {},
   handleAddClick: () => {},
-  handleInstructionChange: () => {},
   handleTextChange: () => {},
-  handleQuestionChange: () => {},
-  handlePromptChange: () => {},
-  handleDirectionChange: () => {},
-  handleHeaderChange: () => {},
   handleDeleteOption: () => {},
   selectedOption: '',
   options: [],
   setOptions: () => {},
-  instructions: [],
-  questions: [],
-  prompts: [],
-  directions: [],
   texts: [],
-  headers: [],
   answerKey: false,
   setAnswerKey: () => {},
 });
@@ -168,14 +152,7 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   const [selectedOption, setSelectedOption] = useState('open-response');
 
   const [options, setOptions] = useState<Option[]>([]);
-
-  const [instructions, setInstructions] = useState<string[]>([]);
-  const [questions, setQuestions] = useState<string[]>([]);
-  const [directions, setDirections] = useState<string[]>([]);
-  const [prompts, setPrompts] = useState<string[]>([]);
   const [texts, setTexts] = useState<string[]>([]);
-
-  const [headers, setHeaders] = useState<string[]>([]);
   const [hiddenWordsState, setHiddenWordsState] = useState<
     Record<string, boolean[]>
   >({});
@@ -186,6 +163,9 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
   const [answerTypeState, setAnswerTypeState] = useState<
     Record<string, string>
   >({});
+  const [numberOfLines, setNumberOfLines] = useState<Record<string, number>>(
+    {}
+  );
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -222,60 +202,6 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
       return updatedTexts;
     });
 
-    setHeaders((prevHeaders) => {
-      const updatedHeaders = [...prevHeaders];
-      if (currentIndex !== -1) {
-        updatedHeaders.splice(currentIndex, 0, 'Write your header here');
-      } else {
-        updatedHeaders.push('Write your header here');
-      }
-      return updatedHeaders;
-    });
-
-    setInstructions((prevInstructions) => {
-      const updatedInstructions = [...prevInstructions];
-      if (currentIndex !== -1) {
-        updatedInstructions.splice(
-          currentIndex,
-          0,
-          'Write your instruction here'
-        );
-      } else {
-        updatedInstructions.push('Write your instruction here');
-      }
-      return updatedInstructions;
-    });
-
-    setQuestions((prevQuestions) => {
-      const updatedQuestions = [...prevQuestions];
-      if (currentIndex !== -1) {
-        updatedQuestions.splice(currentIndex, 0, 'Write your question here');
-      } else {
-        updatedQuestions.push('Write your question here');
-      }
-      return updatedQuestions;
-    });
-
-    setDirections((prevDirections) => {
-      const updatedDirections = [...prevDirections];
-      if (currentIndex !== -1) {
-        updatedDirections.splice(currentIndex, 0, 'Write your direction here');
-      } else {
-        updatedDirections.push('Write your direction here');
-      }
-      return updatedDirections;
-    });
-
-    setPrompts((prevPrompts) => {
-      const updatedPrompts = [...prevPrompts];
-      if (currentIndex !== -1) {
-        updatedPrompts.splice(currentIndex, 0, 'Write your prompt here');
-      } else {
-        updatedPrompts.push('Write your prompt here');
-      }
-      return updatedPrompts;
-    });
-
     setChecklistOptions((prevChecklistOptions) => {
       const updatedChecklistOptions = { ...prevChecklistOptions };
       if (currentIndex !== -1) {
@@ -284,17 +210,6 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         updatedChecklistOptions[newOption.id] = ['Option 1', 'Option 2'];
       }
       return updatedChecklistOptions;
-    });
-  };
-
-  const handleInstructionChange = (id: string, newInstruction: string) => {
-    setInstructions((prevInstructions) => {
-      const updatedInstructions: string[] = [...prevInstructions];
-      const index = options.findIndex((option) => option.id === id);
-      if (index !== -1) {
-        updatedInstructions[index] = newInstruction;
-      }
-      return updatedInstructions;
     });
   };
 
@@ -309,67 +224,13 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const handleQuestionChange = (id: string, newQuestion: string) => {
-    setQuestions((prevQuestions) => {
-      const updatedQuestions: string[] = [...prevQuestions];
-      const index = options.findIndex((option) => option.id === id);
-      if (index !== -1) {
-        updatedQuestions[index] = newQuestion;
-      }
-      return updatedQuestions;
-    });
-  };
-
-  const handlePromptChange = (id: string, newPrompt: string) => {
-    setPrompts((prevPrompts) => {
-      const updatedPrompts: string[] = [...prevPrompts];
-      const index = options.findIndex((option) => option.id === id);
-      if (index !== -1) {
-        updatedPrompts[index] = newPrompt;
-      }
-      return updatedPrompts;
-    });
-  };
-
-  const handleDirectionChange = (id: string, newDirection: string) => {
-    setDirections((prevDirections) => {
-      const updatedDirections: string[] = [...prevDirections];
-      const index = options.findIndex((option) => option.id === id);
-      if (index !== -1) {
-        updatedDirections[index] = newDirection;
-      }
-      return updatedDirections;
-    });
-  };
-
-  const handleHeaderChange = (id: string, newHeader: string) => {
-    setHeaders((prevHeaders) => {
-      const updatedHeaders: string[] = [...prevHeaders];
-      const index = options.findIndex((option) => option.id === id);
-      if (index !== -1) {
-        updatedHeaders[index] = newHeader;
-      }
-      return updatedHeaders;
-    });
-  };
-
   const handleDeleteOption = (id: string, index?: number) => {
     setOptions((prevOptions) =>
       prevOptions.filter((option) => option.id !== id)
     );
 
     if (index !== undefined) {
-      setInstructions((prevInstructions) =>
-        prevInstructions.filter((_, i) => i !== index)
-      );
-      setQuestions((prevQuestions) =>
-        prevQuestions.filter((_, i) => i !== index)
-      );
       setTexts((prevTexts) => prevTexts.filter((_, i) => i !== index));
-      setHeaders((prevHeaders) => prevHeaders.filter((_, i) => i !== index));
-      setDirections((prevDirections) =>
-        prevDirections.filter((_, i) => i !== index)
-      );
       setChecklistOptions(({ [id]: _, ...rest }) => rest);
     }
   };
@@ -495,10 +356,18 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
       [id]: type,
     }));
   };
+  const setNumberOfLine = (id: string, numberOfLines: number) => {
+    setNumberOfLines((prevNumberOfLines) => ({
+      ...prevNumberOfLines,
+      [id]: numberOfLines,
+    }));
+  };
 
   return (
     <WorkSheetContext.Provider
       value={{
+        numberOfLines,
+        setNumberOfLines: setNumberOfLine,
         answerType: answerTypeState,
         setAnswerType,
         answerKey,
@@ -538,22 +407,12 @@ export const WorkSheetProvider = ({ children }: { children: ReactNode }) => {
         setShowDirections: setShowDirectionsForChecklist,
         handleOptionChange,
         handleAddClick,
-        handleInstructionChange,
-        handleQuestionChange,
-        handleDirectionChange,
-        handlePromptChange,
-        handleHeaderChange,
         handleTextChange,
         handleDeleteOption,
         setOptions,
         texts,
         selectedOption,
         options,
-        instructions,
-        prompts,
-        headers,
-        questions,
-        directions,
       }}
     >
       {children}

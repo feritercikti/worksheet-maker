@@ -7,10 +7,9 @@ import { MdDelete } from 'react-icons/md';
 interface InstructionProps {
   id: string;
   index: number;
-  onUpdate: (id: string, newInstruction: string) => void;
 }
 
-const InstructionBox = ({ id, index, onUpdate }: InstructionProps) => {
+const InstructionBox = ({ id, index }: InstructionProps) => {
   const [instruction, setInstruction] = useState(
     'Write your instructions here'
   );
@@ -20,12 +19,17 @@ const InstructionBox = ({ id, index, onUpdate }: InstructionProps) => {
   const [showPalette, setShowPalette] = useState(false);
   const [border, setBorder] = useState('');
 
-  const { setBorderSize, setBorderColor, setBorderStyle, handleDeleteOption } =
-    useContext(WorkSheetContext);
+  const {
+    setBorderSize,
+    setBorderColor,
+    setBorderStyle,
+    handleTextChange,
+    handleDeleteOption,
+  } = useContext(WorkSheetContext);
 
   const handleInstructionChange = (newInstruction: string) => {
     setInstruction(newInstruction);
-    onUpdate(id, newInstruction);
+    handleTextChange(id, newInstruction);
   };
 
   const borderChanger = (e: React.ChangeEvent<HTMLInputElement>) => {
