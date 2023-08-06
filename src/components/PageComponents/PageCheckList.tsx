@@ -29,7 +29,7 @@ const PageCheckList = ({ id, index, direction }: PageCheckListProps) => {
           {option?.map((opt, index) => (
             <li key={index} className='mb-1'>
               <div className='flex  pl-2 gap-2 items-center'>
-                <span className='w-3 h-3 border border-black'></span>
+                <div className='w-3 h-3 border border-black'></div>
                 <p className='break-all'>{opt}</p>
               </div>
             </li>

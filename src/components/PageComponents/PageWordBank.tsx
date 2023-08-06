@@ -22,7 +22,7 @@ const PageWordBank = ({ id }: PageWordBank) => {
   return (
     <div
       className={`w-full mt-2 bg-white ${
-        borderSize !== 0 ? 'py-3 px-3  border-black ' : ''
+        borderSize !== 0 ? 'p-3 border-black ' : ''
       }
       `}
       style={{ borderWidth: `${borderSize}px`, borderColor, borderStyle }}

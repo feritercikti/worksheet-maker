@@ -129,71 +129,50 @@ const Worksheet = () => {
   };
 
   const generatePDF = async () => {
-    if (pdfRef.current) {
-      const pdf = new jsPDF('p', 'mm', 'a4'); // Specify page dimensions
+    const doc = new jsPDF('p', 'px', [880, 900]);
 
-      // Capture the content as a canvas
-      const canvas = await html2canvas(pdfRef.current);
-
-      // Calculate the aspect ratio to fit content within the PDF page
-      const contentWidth = canvas.width;
-      const contentHeight = canvas.height;
-      const pageAspectRatio =
-        pdf.internal.pageSize.getWidth() / pdf.internal.pageSize.getHeight();
-      const contentAspectRatio = contentWidth / contentHeight;
-
-      let pdfWidth;
-      let pdfHeight;
-      if (contentAspectRatio > pageAspectRatio) {
-        pdfWidth = pdf.internal.pageSize.getWidth();
-        pdfHeight =
-          (contentHeight * pdf.internal.pageSize.getWidth()) / contentWidth;
-      } else {
-        pdfHeight = pdf.internal.pageSize.getHeight();
-        pdfWidth =
-          (contentWidth * pdf.internal.pageSize.getHeight()) / contentHeight;
-      }
-
-      // Add the canvas to the PDF
-      pdf.addImage(canvas, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-      // Save the PDF
-      pdf.save('document.pdf');
-    }
+    doc.html(pdfRef.current!, {
+      async callback(doc) {
+        await doc.deletePage(2);
+        await doc.save('document');
+      },
+    });
   };
 
   return (
     <>
       <Header />
-      <label className='flex w-fit mt-5   mx-12 items-center cursor-pointer top-[90px] sticky'>
-        <div className='relative w-10 h-4'>
-          <input
-            type='checkbox'
-            className='sr-only'
-            checked={answerKey}
-            onChange={() => setAnswerKey(!answerKey)}
-          />
-          <div
-            className={`w-full h-full rounded-full shadow-inner ${
-              answerKey ? 'bg-indigo-400' : 'bg-gray-200 '
-            }`}
-          ></div>
-          <div
-            className={`absolute left-0 top-0 w-4 h-4  rounded-full shadow-md transform transition-transform ${
-              answerKey
-                ? 'translate-x-6 bg-white border border-gray-400'
-                : 'translate-x-0 bg-gray-500'
-            }`}
-          ></div>
-        </div>
-        <span className='ml-2 text-white'>Answer Key</span>
-      </label>
-      <button
-        onClick={generatePDF}
-        className='bg-white mx-12 w-fit mt-2 rounded px-2 py-2'
-      >
-        Click to Generate PDF
-      </button>
+      <div className='flex gap-2 mt-2'>
+        <label className='flex w-fit  mx-12 items-center top-[90px] sticky'>
+          <div className='relative w-10 h-4'>
+            <input
+              type='checkbox'
+              className='sr-only'
+              checked={answerKey}
+              onChange={() => setAnswerKey(!answerKey)}
+            />
+            <div
+              className={`w-full h-full rounded-full shadow-inner ${
+                answerKey ? 'bg-indigo-400' : 'bg-gray-200 '
+              }`}
+            ></div>
+            <div
+              className={`absolute left-0 top-0 w-4 h-4  rounded-full shadow-md transform transition-transform ${
+                answerKey
+                  ? 'translate-x-6 bg-white border border-gray-400'
+                  : 'translate-x-0 bg-gray-500'
+              }`}
+            ></div>
+          </div>
+          <span className='ml-2 text-white'>Answer Key</span>
+        </label>
+        <button
+          onClick={generatePDF}
+          className='mx-12 w-fit mt-2 rounded px-2 py-2 text-white bg-green-700 hover:bg-green-900'
+        >
+          Click to Generate PDF
+        </button>
+      </div>
       <div className='flex  mt-5 mx-10 justify-center gap-10'>
         <div className='flex-[1.2_1.2_0%] mb-5  h-[600px]  overflow-y-auto px-2  top-[87px] sticky scrollbar'>
           <div className='w-full mb-5 bg-white'>
@@ -400,8 +379,11 @@ const Worksheet = () => {
           </div>
         </div>
 
-        <div className='flex-[3_3_0%] flex ' ref={pdfRef}>
-          <div className='flex flex-col h-[900px] mb-20 gap-2 ml-12 bg-white w-[800px] p-10 '>
+        <div className='flex-[3_3_0%] flex '>
+          <div
+            className='flex flex-col h-[900px] mb-20 gap-2 ml-10 bg-white w-[800px] p-10'
+            ref={pdfRef}
+          >
             {answerKey && (
               <h1 className='text-center text-red-500 text-2xl'>ANSWER KEY</h1>
             )}
