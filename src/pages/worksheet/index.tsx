@@ -27,7 +27,6 @@ import PageDivider from '@/components/PageComponents/PageDivider';
 import WordBank from '@/components/WordBank';
 import PageWordBank from '@/components/PageComponents/PageWordBank';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 interface StudentInfo {
   name?: string;
@@ -129,11 +128,12 @@ const Worksheet = () => {
   };
 
   const generatePDF = async () => {
-    const doc = new jsPDF('p', 'px', [880, 900]);
+    const doc = new jsPDF('p', 'px', [780, 900]);
 
     doc.html(pdfRef.current!, {
       async callback(doc) {
         await doc.deletePage(2);
+
         await doc.save('document');
       },
     });
@@ -381,12 +381,15 @@ const Worksheet = () => {
 
         <div className='flex-[3_3_0%] flex '>
           <div
-            className='flex flex-col h-[900px] mb-20 gap-2 ml-10 bg-white w-[800px] p-10'
+            className='flex flex-col h-[900px] mb-20 gap-2 ml-10 bg-white w-[700px] p-10'
             ref={pdfRef}
           >
             {answerKey && (
-              <h1 className='text-center text-red-500 text-2xl'>ANSWER KEY</h1>
+              <h2 className='text-center justify-between text-red-500 text-2xl'>
+                ANSWER &nbsp; KEY
+              </h2>
             )}
+
             <div className='flex justify-between w-full flex-end'>
               <div className='flex-1 break-words w-[330px]'>
                 {showTitle && (
