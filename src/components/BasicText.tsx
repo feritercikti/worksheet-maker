@@ -37,6 +37,8 @@ const BasicText = ({ id, index, val }: BasicTextProps) => {
         <span className='w-full bg-gray-300 h-[1px]'></span>
         <div className='w-full flex justify-end'>
           <MdDelete
+            role='button'
+            aria-label='Delete'
             size={25}
             className=' text-red-500  m-2 cursor-pointer hover:text-red-800 '
             onClick={() => handleDeleteOption(id, index)}

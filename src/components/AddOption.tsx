@@ -16,6 +16,7 @@ const AddOption = ({ id, toggleShowAddOption }: AddOptionProps) => {
         className='select-dropdown bg-white border border-gray-300 py-2 px-4  shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full'
         value={selectedOption}
         onChange={handleOptionChange}
+        aria-label='select-option'
       >
         <option value='instruction-box'>Instruction box</option>
         <option value='multiple-choice'>Multiple Choice</option>
@@ -33,7 +34,7 @@ const AddOption = ({ id, toggleShowAddOption }: AddOptionProps) => {
       >
         Add
       </button>
-      <button onClick={() => toggleShowAddOption(id)}>
+      <button onClick={() => toggleShowAddOption(id)} aria-label='Close'>
         <AiOutlineCloseCircle
           className='text-white bg-gray-800 hover:bg-gray-500 rounded-[50%] cursor-pointer absolute -right-2 -top-2'
           size={20}
